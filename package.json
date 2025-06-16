@@ -1,6 +1,7 @@
 {
-  "name": "elephant-poc",
-  "version": "0.1.0",
+  "name": "task-manager-with-todoist",
+  "version": "1.0.0",
+  "description": "A modern, full-stack task management application with comprehensive Todoist synchronization capabilities built on the T3 Stack",
   "private": true,
   "type": "module",
   "scripts": {
