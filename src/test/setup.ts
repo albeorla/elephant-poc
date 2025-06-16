@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 
 // Mock environment variables for testing
 process.env.DATABASE_URL = "file:./test.db"
-// @ts-ignore - We need to override NODE_ENV for testing
+// @ts-expect-error - We need to override NODE_ENV for testing
 process.env.NODE_ENV = "test"
 process.env.SKIP_ENV_VALIDATION = "true"
 

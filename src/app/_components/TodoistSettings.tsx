@@ -101,9 +101,9 @@ export function TodoistSettings() {
           <div className="mt-4 rounded bg-blue-500/10 p-3 text-sm">
             <p className="font-medium">ℹ️ Sync Information</p>
             <ul className="mt-1 list-inside list-disc text-xs">
-              <li>Tasks created with "Sync to Todoist" enabled will appear in your Todoist</li>
+              <li>Tasks created with &quot;Sync to Todoist&quot; enabled will appear in your Todoist</li>
               <li>Updates to synced tasks will be reflected in both systems</li>
-              <li>Use the "Sync from Todoist" button to import your existing Todoist tasks</li>
+              <li>Use the &quot;Sync from Todoist&quot; button to import your existing Todoist tasks</li>
               <li>Deleting a synced task will remove it from both systems</li>
             </ul>
           </div>

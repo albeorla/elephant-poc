@@ -125,7 +125,7 @@ export function TaskManager() {
       </div>
 
       <div className="space-y-2">
-        {tasks?.map((task: any) => (
+        {tasks?.map((task) => (
           <div
             key={task.id}
             className="flex items-center justify-between rounded border p-3"
@@ -150,7 +150,7 @@ export function TaskManager() {
                     <span>📅 {new Date(task.dueDate).toLocaleDateString()}</span>
                   )}
                   {task.labels && task.labels.length > 0 && (
-                    <span>🏷️ {task.labels.map((label: any) => label.name).join(", ")}</span>
+                    <span>🏷️ {task.labels.map((label) => label.name).join(", ")}</span>
                   )}
                 </div>
               </div>

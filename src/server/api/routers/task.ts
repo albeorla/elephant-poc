@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { createTodoistService, type TodoistTask } from "~/server/services/todoist";
+import { createTodoistService } from "~/server/services/todoist";
 
 export const taskRouter = createTRPCRouter({
   // Get all tasks for the current user
@@ -176,19 +176,9 @@ export const taskRouter = createTRPCRouter({
         }
       }
 
-      // Prepare update data
-      const updateData: any = {
-        title: input.title,
-        description: input.description,
-        completed: input.completed,
-        priority: input.priority,
-        dueDate: input.dueDate,
-        syncedAt: existingTask.todoistId ? new Date() : existingTask.syncedAt,
-      };
-
       // Handle label updates
       if (input.labels !== undefined) {
-        // Disconnect all existing labels
+        // Disconnect all existing labels first
         await ctx.db.task.update({
           where: { id: input.id },
           data: {
@@ -197,15 +187,25 @@ export const taskRouter = createTRPCRouter({
             },
           },
         });
-
-        // Connect or create new labels
-        updateData.labels = {
-          connectOrCreate: input.labels.map((labelName) => ({
-            where: { name: labelName },
-            create: { name: labelName },
-          })),
-        };
       }
+
+      // Prepare update data
+      const updateData = {
+        title: input.title,
+        description: input.description,
+        completed: input.completed,
+        priority: input.priority,
+        dueDate: input.dueDate,
+        syncedAt: existingTask.todoistId ? new Date() : existingTask.syncedAt,
+        ...(input.labels !== undefined && {
+          labels: {
+            connectOrCreate: input.labels.map((labelName) => ({
+              where: { name: labelName },
+              create: { name: labelName },
+            })),
+          },
+        }),
+      };
 
       return ctx.db.task.update({
         where: { id: input.id },
