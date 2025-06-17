@@ -28,15 +28,21 @@ export function ThemeProvider({
   storageKey = "taskflow-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [mounted, setMounted] = useState(false);
 
   // Only run on client side after hydration
   useEffect(() => {
     setMounted(true);
-    const storedTheme = localStorage.getItem(storageKey) as Theme;
-    if (storedTheme) {
-      setTheme(storedTheme);
+    try {
+      const storedTheme = localStorage.getItem(storageKey);
+      // Validate stored theme is a valid Theme type
+      if (storedTheme && ["dark", "light", "system"].includes(storedTheme)) {
+        setThemeState(storedTheme as Theme);
+      }
+    } catch (error) {
+      // Ignore localStorage errors (e.g., in private browsing mode)
+      console.warn("Failed to read theme from localStorage:", error);
     }
   }, [storageKey]);
 
@@ -60,14 +66,21 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme, mounted]);
 
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    if (mounted) {
+      try {
+        localStorage.setItem(storageKey, newTheme);
+      } catch (error) {
+        // Ignore localStorage errors (e.g., in private browsing mode)
+        console.warn("Failed to save theme to localStorage:", error);
+      }
+    }
+  };
+
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      if (mounted) {
-        localStorage.setItem(storageKey, theme);
-      }
-      setTheme(theme);
-    },
+    setTheme,
   };
 
   return (
