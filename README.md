@@ -159,7 +159,7 @@ The application uses tRPC for type-safe API communication. Key endpoints include
 - `task.getTodoistStatus` - Check Todoist connection status
 - `task.updateTodoistToken` - Update Todoist API token
 
-For detailed API documentation, see [API.md](./API.md).
+For detailed API documentation, see [API.md](./docs/API.md).
 
 ## Deployment
 
@@ -169,7 +169,7 @@ The application can be deployed to various platforms:
 - **Railway** (supports database hosting)
 - **Docker** (containerized deployment)
 
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+For detailed deployment instructions, see [DEPLOYMENT.md](./docs/DEPLOYMENT.md).
 
 ## Architecture
 
@@ -182,7 +182,7 @@ This application follows modern full-stack patterns:
 - **State Management**: tRPC React Query integration
 - **Testing**: Comprehensive unit and integration testing
 
-For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+For detailed architecture documentation, see [ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Contributing
 
@@ -194,7 +194,7 @@ For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-For detailed development guidelines, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+For detailed development guidelines, see [DEVELOPMENT.md](./docs/DEVELOPMENT.md).
 
 ## License
 
@@ -202,8 +202,8 @@ This project is licensed under the MIT License.
 
 ## Support
 
-- 📖 [Todoist Integration Guide](./TODOIST_INTEGRATION.md)
-- 🏗️ [Architecture Documentation](./ARCHITECTURE.md)
-- 🛠️ [Development Guide](./DEVELOPMENT.md)
-- 🚀 [Deployment Guide](./DEPLOYMENT.md)
-- 📚 [API Reference](./API.md)
+- 📖 [Todoist Integration Guide](./docs/TODOIST_INTEGRATION.md)
+- 🏗️ [Architecture Documentation](./docs/ARCHITECTURE.md)
+- 🛠️ [Development Guide](./docs/DEVELOPMENT.md)
+- 🚀 [Deployment Guide](./docs/DEPLOYMENT.md)
+- 📚 [API Reference](./docs/API.md)

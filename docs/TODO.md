@@ -3,7 +3,7 @@
 ## Documentation Updates
 - [ ] Expand `README.md` with setup instructions for development, database migrations, and running tests.
 - [ ] Document all required environment variables in `.env.example`, including `TODOIST_API_KEY`.
-- [ ] Add a section describing the Todoist integration and link to `TODOIST_INTEGRATION.md`.
+- [ ] Add a section describing the Todoist integration and link to `docs/TODOIST_INTEGRATION.md`.
 - [ ] Provide a short guide for running the Vitest suite and linting commands.
 
 ## Code Improvements

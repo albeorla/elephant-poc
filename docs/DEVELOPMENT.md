@@ -251,7 +251,7 @@ Follow this development order:
 npm run test -- --watch
 
 # Test specific files
-npm run test src/app/_components/TaskManager.test.tsx
+npm run test src/app/_components/task/TaskManager.test.tsx
 
 # Test with coverage to identify gaps
 npm run test:coverage
@@ -601,7 +601,7 @@ describe('TodoistService', () => {
 
 #### Custom Render Function
 ```typescript
-// src/test/setup.ts
+// src/__tests__/setup.ts
 import { render } from '@testing-library/react';
 import { TRPCProvider } from '../trpc/react';
 

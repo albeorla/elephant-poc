@@ -14,6 +14,40 @@ export interface TodoistTask {
   labels?: string[];
   is_completed: boolean;
   created_at: string;
+  project_id?: string;
+  section_id?: string;
+  order?: number;
+  url?: string;
+}
+
+export interface TodoistProject {
+  id: string;
+  name: string;
+  comment_count: number;
+  order: number;
+  color: string;
+  is_shared: boolean;
+  is_favorite: boolean;
+  is_inbox_project: boolean;
+  is_team_inbox: boolean;
+  view_style: string;
+  url: string;
+  parent_id?: string;
+}
+
+export interface TodoistSection {
+  id: string;
+  project_id: string;
+  order: number;
+  name: string;
+}
+
+export interface TodoistLabel {
+  id: string;
+  name: string;
+  color: string;
+  order: number;
+  is_favorite: boolean;
 }
 
 export interface TodoistCreateTask {
@@ -21,7 +55,12 @@ export interface TodoistCreateTask {
   description?: string;
   priority?: number;
   due_date?: string;
+  due_datetime?: string;
+  due_string?: string;
   labels?: string[];
+  project_id?: string;
+  section_id?: string;
+  order?: number;
 }
 
 export interface TodoistUpdateTask {
@@ -29,8 +68,37 @@ export interface TodoistUpdateTask {
   description?: string;
   priority?: number;
   due_date?: string;
+  due_datetime?: string;
+  due_string?: string;
   labels?: string[];
-  is_completed?: boolean;
+}
+
+export interface TodoistCreateProject {
+  name: string;
+  parent_id?: string;
+  order?: number;
+  color?: string;
+  is_favorite?: boolean;
+  view_style?: string;
+}
+
+export interface TodoistUpdateProject {
+  name?: string;
+  order?: number;
+  color?: string;
+  is_favorite?: boolean;
+  view_style?: string;
+}
+
+export interface TodoistCreateSection {
+  name: string;
+  project_id: string;
+  order?: number;
+}
+
+export interface TodoistUpdateSection {
+  name?: string;
+  order?: number;
 }
 
 export class TodoistService {
@@ -44,7 +112,7 @@ export class TodoistService {
   private async request<T>(
     method: string,
     endpoint: string,
-    body?: unknown
+    body?: unknown,
   ): Promise<T> {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
@@ -93,10 +161,62 @@ export class TodoistService {
   async reopenTask(id: string): Promise<void> {
     await this.request<void>("POST", `/tasks/${id}/reopen`);
   }
+
+  // Projects
+  async getProjects(): Promise<TodoistProject[]> {
+    return this.request<TodoistProject[]>("GET", "/projects");
+  }
+
+  async getProject(id: string): Promise<TodoistProject> {
+    return this.request<TodoistProject>("GET", `/projects/${id}`);
+  }
+
+  async createProject(project: TodoistCreateProject): Promise<TodoistProject> {
+    return this.request<TodoistProject>("POST", "/projects", project);
+  }
+
+  async updateProject(id: string, project: TodoistUpdateProject): Promise<TodoistProject> {
+    return this.request<TodoistProject>("POST", `/projects/${id}`, project);
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await this.request<void>("DELETE", `/projects/${id}`);
+  }
+
+  // Sections
+  async getSections(projectId?: string): Promise<TodoistSection[]> {
+    const endpoint = projectId ? `/sections?project_id=${projectId}` : "/sections";
+    return this.request<TodoistSection[]>("GET", endpoint);
+  }
+
+  async getSection(id: string): Promise<TodoistSection> {
+    return this.request<TodoistSection>("GET", `/sections/${id}`);
+  }
+
+  async createSection(section: TodoistCreateSection): Promise<TodoistSection> {
+    return this.request<TodoistSection>("POST", "/sections", section);
+  }
+
+  async updateSection(id: string, section: TodoistUpdateSection): Promise<TodoistSection> {
+    return this.request<TodoistSection>("POST", `/sections/${id}`, section);
+  }
+
+  async deleteSection(id: string): Promise<void> {
+    await this.request<void>("DELETE", `/sections/${id}`);
+  }
+
+  // Labels
+  async getLabels(): Promise<TodoistLabel[]> {
+    return this.request<TodoistLabel[]>("GET", "/labels");
+  }
+
+  async getLabel(id: string): Promise<TodoistLabel> {
+    return this.request<TodoistLabel>("GET", `/labels/${id}`);
+  }
 }
 
 export function createTodoistService(apiKey?: string): TodoistService | null {
   const key = apiKey ?? env.TODOIST_API_KEY;
   if (!key) return null;
   return new TodoistService(key);
-} 
+}

@@ -1,76 +1,99 @@
 import Link from "next/link";
 
-import { LatestPost } from "~/app/_components/post";
-import { TaskManager } from "~/app/_components/TaskManager";
+import { TaskManager } from "~/app/_components/task/TaskManager";
 import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
+import { Button } from "~/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { ThemeToggle } from "~/components/theme-toggle";
 
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
 
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
+  if (!session?.user) {
+    return (
+      <HydrateClient>
+        <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-end mb-8">
+              <ThemeToggle />
+            </div>
+            <div className="mx-auto max-w-2xl text-center">
+              <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-6xl">
+                TaskFlow
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Modern task management with seamless Todoist integration. 
+                Organize your work, sync across platforms, and stay productive.
+              </p>
+              <div className="mt-10 flex items-center justify-center gap-x-6">
+                <Button asChild size="lg">
+                  <Link href="/api/auth/signin">
+                    Get started
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mx-auto mt-16 max-w-4xl">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      📝 Task Management
+                    </CardTitle>
+                    <CardDescription>
+                      Create, organize, and track your tasks with an intuitive interface
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      🔄 Todoist Sync
+                    </CardTitle>
+                    <CardDescription>
+                      Bidirectional synchronization with your Todoist account
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      📁 Projects & Sections
+                    </CardTitle>
+                    <CardDescription>
+                      Organize tasks into projects and sections for better structure
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </main>
+      </HydrateClient>
+    );
   }
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          
-          {/* Show TaskManager for authenticated users */}
-          {session?.user && (
-            <div className="w-full max-w-4xl">
-              <TaskManager />
-            </div>
-          )}
-          
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
+      <main className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">TaskFlow</h1>
+              <p className="text-muted-foreground">
+                Welcome back, {session.user.name}
               </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
             </div>
+            <Button asChild variant="outline">
+              <Link href="/api/auth/signout">
+                Sign out
+              </Link>
+            </Button>
           </div>
-
-          {session?.user && <LatestPost />}
+          
+          <TaskManager />
         </div>
       </main>
     </HydrateClient>
