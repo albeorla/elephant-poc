@@ -52,11 +52,13 @@ AUTH_SECRET="your-long-random-string-here"  # Generate with: openssl rand -base6
 AUTH_DISCORD_ID="your-discord-client-id"
 AUTH_DISCORD_SECRET="your-discord-client-secret"
 
-# Optional: Todoist Integration
+# Optional: Todoist Integration (see TODOIST_INTEGRATION.md for setup)
 TODOIST_API_KEY="your-todoist-api-token"
 ```
 
 #### 4. Discord OAuth Setup
+
+> 💡 **Having authentication issues?** See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common solutions.
 
 For local development authentication:
 
@@ -104,6 +106,8 @@ NEXTAUTH_URL="http://localhost:3000"
 ```
 
 ## Project Structure
+
+> 📚 **Note**: For detailed architecture decisions and system design, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ### Directory Overview
 
@@ -266,7 +270,7 @@ npm run test
 # Check code quality
 npm run check
 
-# Build to ensure no build errors
+# Build to ensure no build errors (see DEPLOYMENT.md for production builds)
 npm run build
 ```
 
@@ -360,6 +364,8 @@ export function TaskManager() {
 
 ### API Design Guidelines
 
+> 📚 **Note**: For complete API documentation with endpoints and examples, see [API.md](./API.md). For architecture decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 #### tRPC Router Structure
 ```typescript
 export const taskRouter = createTRPCRouter({
@@ -445,6 +451,8 @@ const getUserTasks = async (userId: string) => {
 ```
 
 ## Testing
+
+> 📚 **Note**: For comprehensive testing strategies, test coverage details, and confidence reports, see [TESTING.md](./TESTING.md).
 
 ### Testing Philosophy
 
@@ -818,6 +826,8 @@ refactor: extract task validation logic
 ```
 
 ## Troubleshooting
+
+> 📚 **Note**: For comprehensive troubleshooting including authentication issues, see [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
 
 ### Common Issues
 

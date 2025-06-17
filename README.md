@@ -200,10 +200,22 @@ For detailed development guidelines, see [DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
 This project is licensed under the MIT License.
 
-## Support
+## Documentation
 
-- 📖 [Todoist Integration Guide](./docs/TODOIST_INTEGRATION.md)
-- 🏗️ [Architecture Documentation](./docs/ARCHITECTURE.md)
-- 🛠️ [Development Guide](./docs/DEVELOPMENT.md)
-- 🚀 [Deployment Guide](./docs/DEPLOYMENT.md)
-- 📚 [API Reference](./docs/API.md)
+### 📚 [Full Documentation Index](./docs/README.md)
+
+Comprehensive documentation is available in the `/docs` directory:
+
+#### Getting Started
+- 🛠️ [Development Guide](./docs/DEVELOPMENT.md) - Setup, coding standards, and workflow
+- 🧪 [Testing Guide](./docs/TESTING.md) - Testing strategies and coverage reports
+- 🚨 [Troubleshooting](./docs/TROUBLESHOOTING.md) - Common issues and solutions
+
+#### Technical Reference
+- 🏗️ [Architecture](./docs/ARCHITECTURE.md) - System design and technical decisions
+- 📚 [API Reference](./docs/API.md) - Complete tRPC endpoint documentation
+- 🔄 [Todoist Integration](./docs/TODOIST_INTEGRATION.md) - Sync setup and usage
+
+#### Operations
+- 🚀 [Deployment Guide](./docs/DEPLOYMENT.md) - Production deployment instructions
+- 📊 [Feature Analysis](./docs/FEATURE-ANALYSIS.md) - User stories and feature evaluation
