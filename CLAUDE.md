@@ -4,7 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a production-ready task management application with comprehensive Todoist integration built on the T3 Stack. The application features bidirectional synchronization between local tasks and Todoist, with user authentication via Discord OAuth.
+This is a production-ready task management application implementing the Getting Things Done (GTD) methodology with PARA organizational system, comprehensive Todoist integration, built on the T3 Stack. The application features:
+
+- Complete GTD workflow implementation (Capture, Clarify, Organize, Reflect, Engage)
+- PARA method organization (Projects, Areas, Resources, Archives)
+- Context-based task management (@home, @office, @phone, etc.)
+- Energy level and time estimation tracking
+- Bidirectional synchronization with Todoist
+- User authentication via Discord OAuth
 
 ## Essential Commands
 
@@ -44,20 +51,45 @@ npm run format:write # Format code with Prettier
 
 ### tRPC API Structure
 The API is organized into routers in `src/server/api/routers/`:
-- **Task Router** (`task.ts`) - All task management operations including Todoist sync
+- **Task Router** (`task.ts`) - All task management operations including GTD workflow and Todoist sync
+- **Project Router** (`project.ts`) - Project management with PARA categorization
 - **Post Router** (`post.ts`) - Legacy demo functionality
 
-Key endpoints:
-- `api.task.getAll` - Get user's tasks
-- `api.task.create` - Create task with optional Todoist sync
+Key Task Endpoints:
+- `api.task.getAll` - Get all user's tasks
+- `api.task.getInbox` - Get unprocessed inbox items
+- `api.task.getNextActions` - Get next actions filtered by context/energy/time
+- `api.task.getWaitingFor` - Get delegated tasks
+- `api.task.getSomedayMaybe` - Get someday/maybe items
+- `api.task.processInboxItem` - Process inbox item through GTD workflow
+- `api.task.create` - Create task (defaults to inbox)
 - `api.task.update` - Update task with bidirectional sync
 - `api.task.syncFromTodoist` - Import/sync from Todoist
+
+Key Project Endpoints:
+- `api.project.getByType` - Get projects by PARA type
+- `api.project.archiveProject` - Archive a project
+- `api.project.convertProjectType` - Convert between PARA types
 
 ### Database Schema (Prisma)
 Core models:
 - **User** - NextAuth.js user with `todoistApiToken` field
-- **Task** - Tasks with `todoistId` for external linking and `syncedAt` for sync tracking
+- **Task** - Tasks with GTD properties:
+  - `taskType` (INBOX, ACTION, PROJECT, SOMEDAY, REFERENCE, WAITING)
+  - `context` (@home, @office, @phone, @computer, @errands)
+  - `energyLevel` (HIGH, MEDIUM, LOW)
+  - `timeEstimate` (minutes)
+  - `isNextAction` (boolean)
+  - `waitingFor` (person/thing waiting on)
+  - `todoistId` for external linking
+- **Project** - Projects with PARA properties:
+  - `projectType` (PROJECT, AREA, RESOURCE, ARCHIVE)
+  - `status` (ACTIVE, ON_HOLD, COMPLETED, ARCHIVED)
+  - `outcome` (desired outcome)
+  - `reviewInterval` (DAILY, WEEKLY, MONTHLY, QUARTERLY)
 - **Label** - Many-to-many relationship with tasks
+- **ProcessingSession** - Track GTD processing sessions
+- **WeeklyReview** - Track weekly reviews
 - Standard NextAuth.js models (Account, Session, etc.)
 
 ### Authentication Flow

@@ -44,16 +44,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    tasks         Task[]
-    projects      Project[]
-    todoistApiToken String?
+    id                  String              @id @default(cuid())
+    name                String?
+    email               String?             @unique
+    emailVerified       DateTime?
+    image               String?
+    accounts            Account[]
+    sessions            Session[]
+    tasks               Task[]
+    projects            Project[]
+    processingSessions  ProcessingSession[]
+    weeklyReviews       WeeklyReview[]
+    todoistApiToken     String?
 }
 
 model VerificationToken {
@@ -64,60 +66,118 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+// GTD/PARA Enums
+enum TaskType {
+    INBOX
+    ACTION
+    PROJECT
+    SOMEDAY
+    REFERENCE
+    WAITING
+}
+
+enum EnergyLevel {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum ProjectType {
+    PROJECT
+    AREA
+    RESOURCE
+    ARCHIVE
+}
+
+enum ProjectStatus {
+    ACTIVE
+    ON_HOLD
+    COMPLETED
+    ARCHIVED
+}
+
+enum ReviewInterval {
+    DAILY
+    WEEKLY
+    MONTHLY
+    QUARTERLY
+}
+
 model Task {
-    id              String    @id @default(cuid())
-    todoistId       String?   @unique
+    id              String       @id @default(cuid())
+    todoistId       String?      @unique
     title           String
     description     String?
-    completed       Boolean   @default(false)
-    priority        Int       @default(1)
+    completed       Boolean      @default(false)
+    priority        Int          @default(1)
     dueDate         DateTime?
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
     syncedAt        DateTime?
     order           Int?
     
+    // GTD properties
+    taskType        TaskType     @default(INBOX)
+    context         String?      // @home, @office, @phone, @computer, @errands
+    energyLevel     EnergyLevel?
+    timeEstimate    Int?         // in minutes
+    isNextAction    Boolean      @default(false)
+    waitingFor      String?      // person/thing waiting on
+    reviewedAt      DateTime?    // last processing/review date
+    
     userId          String
-    user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
     labels          Label[]
     
     projectId       String?
-    project         Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+    project         Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
     
     sectionId       String?
-    section         Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+    section         Section?     @relation(fields: [sectionId], references: [id], onDelete: SetNull)
     
     @@index([userId])
     @@index([todoistId])
     @@index([projectId])
     @@index([sectionId])
+    @@index([taskType])
+    @@index([context])
+    @@index([isNextAction])
 }
 
 model Project {
-    id              String    @id @default(cuid())
-    todoistId       String?   @unique
+    id              String          @id @default(cuid())
+    todoistId       String?         @unique
     name            String
     color           String?
     order           Int?
-    isFavorite      Boolean   @default(false)
-    isInboxProject  Boolean   @default(false)
+    isFavorite      Boolean         @default(false)
+    isInboxProject  Boolean         @default(false)
     viewStyle       String?
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
     syncedAt        DateTime?
     
+    // PARA properties
+    projectType     ProjectType     @default(PROJECT)
+    status          ProjectStatus   @default(ACTIVE)
+    outcome         String?         // desired outcome for GTD projects
+    reviewInterval  ReviewInterval?
+    archivedAt      DateTime?
+    
     userId          String
-    user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     tasks           Task[]
     sections        Section[]
     
     parentId        String?
-    parent          Project?  @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-    children        Project[] @relation("ProjectHierarchy")
+    parent          Project?        @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+    children        Project[]       @relation("ProjectHierarchy")
     
     @@index([userId])
     @@index([todoistId])
     @@index([parentId])
+    @@index([projectType])
+    @@index([status])
 }
 
 model Section {
@@ -143,4 +203,35 @@ model Label {
     tasks   Task[]
     
     @@unique([name])
+}
+
+// GTD Processing Session
+model ProcessingSession {
+    id          String   @id @default(cuid())
+    startedAt   DateTime @default(now())
+    completedAt DateTime?
+    itemsProcessed Int   @default(0)
+    notes       String?
+    
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    @@index([userId])
+}
+
+// Weekly Review
+model WeeklyReview {
+    id              String   @id @default(cuid())
+    weekStartDate   DateTime
+    completedAt     DateTime @default(now())
+    inboxZero       Boolean  @default(false)
+    projectsReviewed Int     @default(0)
+    nextActionsReviewed Int  @default(0)
+    notes           String?
+    
+    userId          String
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    @@index([userId])
+    @@index([weekStartDate])
 }

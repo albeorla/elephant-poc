@@ -4,6 +4,15 @@ Welcome to the comprehensive documentation for the Task Management Application w
 
 ## 📚 Documentation Overview
 
+### Getting Started
+
+#### **[QUICK_START.md](./QUICK_START.md)** - GTD Quick Start Guide
+Get up and running with the GTD/PARA system in just 5 minutes.
+- Basic GTD workflow
+- Understanding contexts and energy levels
+- Daily and weekly routines
+- Essential keyboard shortcuts
+
 ### Core Documentation
 
 #### **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Developer Guide
@@ -28,6 +37,20 @@ Complete tRPC API documentation with all endpoints, request/response formats, an
 - Code examples
 
 ### Feature Documentation
+
+#### **[GTD_PARA_GUIDE.md](./GTD_PARA_GUIDE.md)** - GTD/PARA Implementation
+Comprehensive guide to the Getting Things Done and PARA methodologies.
+- Complete GTD workflow implementation
+- PARA organizational system
+- Processing workflows and best practices
+- Troubleshooting common issues
+
+#### **[GTD_TECHNICAL_IMPLEMENTATION.md](./GTD_TECHNICAL_IMPLEMENTATION.md)** - GTD Technical Details
+Technical implementation documentation for the GTD/PARA system.
+- Database schema extensions
+- API endpoint design
+- Component architecture
+- Performance optimizations
 
 #### **[TODOIST_INTEGRATION.md](./TODOIST_INTEGRATION.md)** - Todoist Integration
 Comprehensive guide to the bidirectional Todoist synchronization feature.
@@ -87,9 +110,9 @@ Common issues and solutions for development and production.
 
 ## 📊 Documentation Stats
 
-- **Total Documentation**: 8 comprehensive guides
-- **Combined Length**: ~4,000+ lines
-- **Coverage**: Development, Testing, Deployment, Architecture, API, Features
+- **Total Documentation**: 11 comprehensive guides
+- **Combined Length**: ~7,000+ lines
+- **Coverage**: Development, Testing, Deployment, Architecture, API, Features, GTD/PARA
 - **Last Updated**: Check individual files for latest updates
 
 ## 🔄 Keeping Documentation Updated

@@ -7,6 +7,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { ThemeToggle } from "~/components/theme-toggle";
 
+import { DashboardLayout } from "~/app/_components/DashboardLayout";
+import { redirect } from "next/navigation";
+
 export default async function Home() {
   const session = await auth();
 
@@ -75,27 +78,6 @@ export default async function Home() {
     );
   }
 
-  return (
-    <HydrateClient>
-      <main className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">TaskFlow</h1>
-              <p className="text-muted-foreground">
-                Welcome back, {session.user.name}
-              </p>
-            </div>
-            <Button asChild variant="outline">
-              <Link href="/api/auth/signout">
-                Sign out
-              </Link>
-            </Button>
-          </div>
-          
-          <TaskManager />
-        </div>
-      </main>
-    </HydrateClient>
-  );
+  // Redirect authenticated users to inbox
+  redirect("/inbox");
 }

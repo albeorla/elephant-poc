@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createTodoistService } from "~/server/services/todoist";
+import { TaskType, EnergyLevel } from "@prisma/client";
 
 export const taskRouter = createTRPCRouter({
   // Get all tasks for the current user
@@ -97,6 +98,7 @@ export const taskRouter = createTRPCRouter({
           todoistId,
           syncedAt: todoistId ? new Date() : null,
           userId: ctx.session.user.id,
+          taskType: "INBOX", // New tasks default to inbox
           labels: {
             connectOrCreate: input.labels.map((labelName) => ({
               where: { name: labelName },
@@ -125,6 +127,12 @@ export const taskRouter = createTRPCRouter({
         labels: z.array(z.string()).optional(),
         projectId: z.string().nullable().optional(),
         sectionId: z.string().nullable().optional(),
+        taskType: z.nativeEnum(TaskType).optional(),
+        context: z.string().optional(),
+        energyLevel: z.nativeEnum(EnergyLevel).optional(),
+        timeEstimate: z.number().optional(),
+        isNextAction: z.boolean().optional(),
+        waitingFor: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -427,7 +435,7 @@ export const taskRouter = createTRPCRouter({
               syncedAt: new Date(),
               projectId,
               sectionId,
-              order: todoistTask.order || existingTask.order,
+              order: todoistTask.order || 0,
               labels: {
                 connectOrCreate: (todoistTask.labels ?? []).map((labelName) => ({
                   where: { name: labelName },
@@ -473,6 +481,189 @@ export const taskRouter = createTRPCRouter({
       connected: !!user?.todoistApiToken,
     };
   }),
+
+  // Get inbox tasks (unprocessed items)
+  getInbox: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.task.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        taskType: "INBOX",
+        completed: false,
+      },
+      orderBy: [
+        { priority: "desc" },
+        { createdAt: "asc" },
+      ],
+      include: {
+        labels: true,
+        project: true,
+        section: true,
+      },
+    });
+  }),
+
+  // Get next actions
+  getNextActions: protectedProcedure
+    .input(
+      z.object({
+        context: z.string().optional(),
+        energyLevel: z.nativeEnum(EnergyLevel).optional(),
+        maxTime: z.number().optional(), // max time in minutes
+      }).optional(),
+    )
+    .query(async ({ ctx, input }) => {
+      const where: any = {
+        userId: ctx.session.user.id,
+        isNextAction: true,
+        completed: false,
+        taskType: { in: ["ACTION", "PROJECT"] },
+      };
+
+      if (input?.context) {
+        where.context = input.context;
+      }
+
+      if (input?.energyLevel) {
+        where.energyLevel = input.energyLevel;
+      }
+
+      if (input?.maxTime) {
+        where.timeEstimate = { lte: input.maxTime };
+      }
+
+      return ctx.db.task.findMany({
+        where,
+        orderBy: [
+          { priority: "desc" },
+          { dueDate: "asc" },
+        ],
+        include: {
+          labels: true,
+          project: true,
+          section: true,
+        },
+      });
+    }),
+
+  // Get waiting for tasks
+  getWaitingFor: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.task.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        taskType: "WAITING",
+        completed: false,
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        labels: true,
+        project: true,
+        section: true,
+      },
+    });
+  }),
+
+  // Get someday/maybe tasks
+  getSomedayMaybe: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.task.findMany({
+      where: {
+        userId: ctx.session.user.id,
+        taskType: "SOMEDAY",
+        completed: false,
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        labels: true,
+        project: true,
+        section: true,
+      },
+    });
+  }),
+
+  // Process inbox item
+  processInboxItem: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        taskType: z.nativeEnum(TaskType),
+        context: z.string().optional(),
+        energyLevel: z.nativeEnum(EnergyLevel).optional(),
+        timeEstimate: z.number().optional(),
+        isNextAction: z.boolean().optional(),
+        waitingFor: z.string().optional(),
+        projectId: z.string().optional(),
+        notes: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, notes, ...updateData } = input;
+
+      // Get the existing task first
+      const existingTask = await ctx.db.task.findFirst({
+        where: { id, userId: ctx.session.user.id },
+      });
+
+      if (!existingTask) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Task not found",
+        });
+      }
+
+      // Update the task
+      const updatedTask = await ctx.db.task.update({
+        where: { id },
+        data: {
+          ...updateData,
+          reviewedAt: new Date(),
+          description: notes ? `${existingTask.description ?? ""}\n\nProcessing notes: ${notes}`.trim() : existingTask.description,
+        },
+        include: {
+          labels: true,
+          project: true,
+          section: true,
+        },
+      });
+
+      // Track processing session
+      await ctx.db.processingSession.upsert({
+        where: {
+          id: ctx.session.user.id + "-current",
+        },
+        update: {
+          itemsProcessed: { increment: 1 },
+        },
+        create: {
+          id: ctx.session.user.id + "-current",
+          userId: ctx.session.user.id,
+          itemsProcessed: 1,
+        },
+      });
+
+      return updatedTask;
+    }),
+
+  // Get tasks by context
+  getByContext: protectedProcedure
+    .input(z.object({ context: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.task.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          context: input.context,
+          completed: false,
+        },
+        orderBy: [
+          { isNextAction: "desc" },
+          { priority: "desc" },
+          { dueDate: "asc" },
+        ],
+        include: {
+          labels: true,
+          project: true,
+          section: true,
+        },
+      });
+    }),
 
   // Unified sync from Todoist (projects, sections, and tasks)
   syncAllFromTodoist: protectedProcedure.mutation(async ({ ctx }) => {

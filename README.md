@@ -5,9 +5,14 @@ A modern, full-stack task management application built with the T3 Stack, featur
 ## Features
 
 - ✅ **Complete Task Management** - Create, edit, delete, and organize tasks with priorities, due dates, and labels
+- 🎯 **GTD/PARA Implementation** - Full Getting Things Done workflow with PARA organizational method
 - 🔄 **Bidirectional Todoist Sync** - Seamlessly sync tasks between the local app and your Todoist account
+- 📥 **Inbox Processing** - Step-by-step GTD workflow for processing captured items
+- 🏷️ **Context-Based Organization** - Organize tasks by context (@home, @office, @phone, etc.)
+- ⚡ **Energy & Time Tracking** - Match tasks to your energy levels and available time
 - 🔐 **Secure Authentication** - Discord OAuth integration with NextAuth.js
 - 📱 **Real-time Updates** - Instant UI updates with optimistic mutations
+- ⌨️ **Quick Capture** - Global keyboard shortcut (Cmd/Ctrl+N) for instant task capture
 - 🧪 **Comprehensive Testing** - 96% test coverage across components, APIs, and services
 - 🎨 **Modern UI** - Responsive design with Tailwind CSS
 - 🛡️ **Type Safety** - End-to-end type safety with TypeScript and tRPC
@@ -84,12 +89,19 @@ Visit `http://localhost:3000` to see the application.
 
 ## Usage
 
+### GTD Workflow
+
+- **Quick Capture**: Press `Cmd/Ctrl+N` anywhere to capture tasks to inbox
+- **Process Inbox**: Visit `/inbox` to process items using GTD methodology
+- **Next Actions**: Check `/next-actions` filtered by your current context
+- **Weekly Review**: Review projects and tasks regularly
+
 ### Basic Task Management
 
-- **Create Tasks**: Use the input field to add new tasks
+- **Create Tasks**: Use quick capture or the input field
 - **Complete Tasks**: Check/uncheck tasks to mark completion
 - **Delete Tasks**: Click the delete button to remove tasks
-- **Sync Toggle**: Enable "Sync to Todoist" when creating tasks to sync with Todoist
+- **Organize**: Use contexts, energy levels, and PARA categories
 
 ### Todoist Synchronization
 
@@ -207,6 +219,7 @@ This project is licensed under the MIT License.
 Comprehensive documentation is available in the `/docs` directory:
 
 #### Getting Started
+- 🚀 [GTD Quick Start](./docs/QUICK_START.md) - Get started with GTD in 5 minutes
 - 🛠️ [Development Guide](./docs/DEVELOPMENT.md) - Setup, coding standards, and workflow
 - 🧪 [Testing Guide](./docs/TESTING.md) - Testing strategies and coverage reports
 - 🚨 [Troubleshooting](./docs/TROUBLESHOOTING.md) - Common issues and solutions
@@ -214,6 +227,8 @@ Comprehensive documentation is available in the `/docs` directory:
 #### Technical Reference
 - 🏗️ [Architecture](./docs/ARCHITECTURE.md) - System design and technical decisions
 - 📚 [API Reference](./docs/API.md) - Complete tRPC endpoint documentation
+- 🎯 [GTD/PARA Guide](./docs/GTD_PARA_GUIDE.md) - Complete GTD methodology implementation
+- 🔧 [GTD Technical Docs](./docs/GTD_TECHNICAL_IMPLEMENTATION.md) - GTD system architecture
 - 🔄 [Todoist Integration](./docs/TODOIST_INTEGRATION.md) - Sync setup and usage
 
 #### Operations

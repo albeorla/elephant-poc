@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { createTodoistService } from "~/server/services/todoist";
+import { ProjectType, ProjectStatus } from "@prisma/client";
 
 export const projectRouter = createTRPCRouter({
   // Get all projects for the user
@@ -212,6 +213,92 @@ export const projectRouter = createTRPCRouter({
 
       await ctx.db.project.delete({
         where: { id: input.id },
+      });
+    }),
+
+  // Get projects by PARA type
+  getByType: protectedProcedure
+    .input(
+      z.object({
+        projectType: z.nativeEnum(ProjectType).optional(),
+        status: z.nativeEnum(ProjectStatus).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const where: any = {
+        userId: ctx.session.user.id,
+      };
+
+      if (input.projectType) {
+        where.projectType = input.projectType;
+      }
+
+      if (input.status) {
+        where.status = input.status;
+      }
+
+      return ctx.db.project.findMany({
+        where,
+        include: {
+          sections: {
+            orderBy: { order: "asc" },
+          },
+          tasks: {
+            where: { sectionId: null },
+            orderBy: { order: "asc" },
+          },
+          _count: {
+            select: { tasks: true },
+          },
+        },
+        orderBy: [
+          { status: "asc" },
+          { order: "asc" },
+        ],
+      });
+    }),
+
+  // Archive a project
+  archiveProject: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.project.update({
+        where: { id: input.id },
+        data: {
+          status: "ARCHIVED",
+          projectType: "ARCHIVE",
+          archivedAt: new Date(),
+        },
+        include: {
+          sections: true,
+          _count: {
+            select: { tasks: true },
+          },
+        },
+      });
+    }),
+
+  // Convert project type
+  convertProjectType: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        projectType: z.nativeEnum(ProjectType),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.project.update({
+        where: { id: input.id },
+        data: {
+          projectType: input.projectType,
+          status: input.projectType === "ARCHIVE" ? "ARCHIVED" : "ACTIVE",
+        },
+        include: {
+          sections: true,
+          _count: {
+            select: { tasks: true },
+          },
+        },
       });
     }),
 
